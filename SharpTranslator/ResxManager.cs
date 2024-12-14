@@ -5,12 +5,9 @@ namespace SharpTranslator;
 internal class ResxManager
 {
 
-	public static void Write(string filePath, Dictionary<string, string> dic)
+	public static void Write(string filePath, List<Resource> resources)
 	{
-		if (dic.Count == 0)
-		{
-			return;
-		}
+		if (!resources.Any()) return;
 
 		var xmlDocument = new XmlDocument();
 		xmlDocument.Load(filePath);
@@ -19,23 +16,24 @@ internal class ResxManager
 		foreach (XmlNode node in nodes)
 		{
 			var key = node.Attributes["name"].Value;
-			if (dic.TryGetValue(key, out var value))
+			if (resources.Any(r => r.Name.Equals(key, StringComparison.InvariantCultureIgnoreCase)))
 			{
+				var resource = resources.First(r => r.Name.Equals(key, StringComparison.InvariantCultureIgnoreCase));
 				var valueNode = node.SelectSingleNode("value");
-				valueNode.InnerText = value;
-				dic.Remove(key);
+				valueNode.InnerText = resource.Value;
+				resources.Remove(resource);
 				continue;
 			}
 		}
 
-		foreach (var pair in dic)
+		foreach (var pair in resources)
 		{
 			var dataNode = xmlDocument.CreateElement("data");
 			var nameAttr = xmlDocument.CreateAttribute("name");
 			var xmlSpaceAttr = xmlDocument.CreateAttribute("xml:space");
 
 			xmlSpaceAttr.Value = "preserve";
-			nameAttr.Value = pair.Key;
+			nameAttr.Value = pair.Name;
 			dataNode.Attributes.Append(nameAttr);
 			dataNode.Attributes.Append(xmlSpaceAttr);
 
@@ -49,9 +47,9 @@ internal class ResxManager
 		xmlDocument.Save(filePath);
 	}
 
-	public static Dictionary<string, string> Read(string filePath)
+	public static List<Resource> Read(string filePath)
 	{
-		var dict = new Dictionary<string, string>();
+		var outList = new List<Resource>();
 
 		var xmlDocument = new XmlDocument();
 		xmlDocument.Load(filePath);
@@ -61,11 +59,12 @@ internal class ResxManager
 		{
 			var key = node.Attributes["name"].Value;
 			var value = node.SelectSingleNode("value").InnerText;
-			dict.Add(key, value);
+			var comment = node.SelectSingleNode("comment")?.InnerText;	
+			outList.Add(new Resource(key, value, comment));
 		}
 
-		return dict;
+		return outList;
 	}
 }
 
-}
+public record Resource(string Name, string Value, string Comment);
