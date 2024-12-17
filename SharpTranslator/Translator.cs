@@ -32,7 +32,12 @@ internal class Translator
 		endpoint = config["endpoint"];
 	}
 
-	public async Task<string> TranslateAsync(string fromLanguage, string toLanguage, string resourceDescription, string text, int maxOutputTokens = 400)
+	public async Task<string> TranslateAsync(
+		string fromLanguage,
+		string toLanguage,
+		string resourceDescription,
+		string text,
+		int maxOutputTokens = 400)
 	{
 
 		var client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(key))
