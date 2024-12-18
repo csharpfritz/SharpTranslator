@@ -38,7 +38,9 @@ static async Task TranslateForALanguage(Translator tx, string fromFile, string t
 	var resources = ResxManager.Read(fromFile);
 	var toResources = ResxManager.Read(toFile);
 
-	var missingResources = resources.Where(r => !toResources.Any(tr => tr.Name.Equals(r.Name, StringComparison.InvariantCultureIgnoreCase))).ToList();
+	var missingResources = resources.Where(r =>
+		!toResources.Any(tr => tr.Name.Equals(r.Name, StringComparison.InvariantCultureIgnoreCase)))
+		.ToList();
 
 	var newResources = new List<Resource>();
 	foreach (var resource in missingResources)

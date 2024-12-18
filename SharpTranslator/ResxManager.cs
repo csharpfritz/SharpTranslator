@@ -41,6 +41,11 @@ internal class ResxManager
 			valueNode.InnerText = pair.Value;
 			dataNode.AppendChild(valueNode);
 
+			// add a comment element to indicate that this is an AI generated translation
+			var commentNode = xmlDocument.CreateElement("comment");
+			commentNode.InnerText = "AI generated translation";
+			dataNode.AppendChild(commentNode);
+
 			xmlDocument.DocumentElement.AppendChild(dataNode);
 		}
 
@@ -59,7 +64,7 @@ internal class ResxManager
 		{
 			var key = node.Attributes["name"].Value;
 			var value = node.SelectSingleNode("value").InnerText;
-			var comment = node.SelectSingleNode("comment")?.InnerText;	
+			var comment = node.SelectSingleNode("comment")?.InnerText;
 			outList.Add(new Resource(key, value, comment));
 		}
 
