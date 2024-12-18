@@ -21,7 +21,7 @@ internal class Translator
 	from language ISO 639-1 '{0}' to language ISO 639-1 '{1}'
 	SharpSite is an open source content management system website built with C# and Blazor
 	you are translating text to be presented on a website to a user
-	the text to translate will be used as {2}
+	{2}
 	Text to translate: {3}
 	";
 
@@ -43,6 +43,7 @@ internal class Translator
 		var client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(key))
 				.AsChatClient(model);
 
+		resourceDescription = string.IsNullOrEmpty(resourceDescription) ? string.Empty : $"the text to translate will be used as {resourceDescription}\n";
 		var prompt = string.Format(PromptTemplate, fromLanguage, toLanguage, resourceDescription, text);
 		var response = await client.CompleteAsync(prompt, new ChatOptions { MaxOutputTokens = maxOutputTokens });
 		return response.Message.Text;
