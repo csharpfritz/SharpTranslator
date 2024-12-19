@@ -22,6 +22,21 @@ internal class ResxManager
 				var valueNode = node.SelectSingleNode("value");
 				valueNode.InnerText = resource.Value;
 				resources.Remove(resource);
+
+				// clean up any garbage from the ResourceEditor
+				if (node.Attributes["type"] != null)
+				{
+					node.Attributes.Remove(node.Attributes["type"]);
+				}
+
+				// add a xml:space attribute to the value node if missing
+				if (valueNode.Attributes["xml:space"] == null)
+				{
+					var xmlSpaceAttr = xmlDocument.CreateAttribute("xml:space");
+					xmlSpaceAttr.Value = "preserve";
+					valueNode.Attributes.Append(xmlSpaceAttr);
+				}
+
 				continue;
 			}
 		}
